@@ -1,0 +1,50 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+
+  - name: istall updates (CentOS)
+    tags: always
+    dnf:
+      update_only: yes
+      update_cache: yes
+    when: ansible_distribution in ["CentOS"]
+
+  - name: install updates (Ubuntu)
+    tags: always
+    apt:
+      upgrade: dist
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+
+- hosts: web_servers
+  tags: apache, apache2, ubuntu
+  become: true
+  tasks:
+  - name: install apache2 package
+    apt: 
+      name: 
+        - apache2
+        - libapache2-mod-php
+      state: latest
+    when: ansible_distribution == "Ubuntu"
+
+- hosts: web_servers
+  tags: apache, apache2, ubuntu
+  become: true
+  tasks:
+  - name: install mysql package
+    apt: 
+      name: 
+        - mysql
+      state: latest
+    when: ansible_distribution == "Ubuntu"
+
+  - name: install mysql package (CentOS)
+    tags: db, mysql, centos
+    dnf: 
+      name: 
+        - mysql_centOS
+      state: latest
+    when: ansible_distribution == "CentOS"
